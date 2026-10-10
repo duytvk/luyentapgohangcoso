@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vườn Phím Xanh - Luyện gõ hàng cơ sở</title>
+  <style>
+    * { -webkit-box-sizing: border-box; box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body {
+      color: #243447; background: #eff8f4;
+      font-family: Arial, Tahoma, sans-serif; font-size: 16px; line-height: 1.35;
+    }
+    button { font: inherit; }
+    button:focus { outline: 4px solid #ffd23f; outline-offset: 3px; }
+    .app { width: 100%; max-width: 1180px; margin: 0 auto; padding: 14px 18px 22px; }
+
+    .topbar { display: table; width: 100%; margin-bottom: 12px; }
+    .brand, .scoreboard { display: table-cell; vertical-align: middle; }
+    .brand { width: 48%; }
+    .brand-mark {
+      display: inline-block; width: 58px; height: 58px; margin-right: 10px;
+      border: 3px solid #214235; border-radius: 18px; color: #fff; background: #30a84b;
+      font-size: 30px; font-weight: bold; line-height: 52px; text-align: center; vertical-align: middle;
+      -webkit-box-shadow: 4px 4px 0 #bfe0c8; box-shadow: 4px 4px 0 #bfe0c8;
+    }
+    h1 { display: inline-block; margin: 0; color: #174d38; font-size: 27px; line-height: 1.05; vertical-align: middle; }
+    h1 span { display: block; margin-top: 5px; color: #60756d; font-size: 12px; font-weight: normal; letter-spacing: .5px; }
+    .scoreboard { text-align: right; white-space: nowrap; }
+    .stat {
+      display: inline-block; min-width: 83px; margin-left: 5px; padding: 6px 8px;
+      border: 2px solid #315447; border-radius: 11px; background: #fff; text-align: center;
+      -webkit-box-shadow: 3px 3px 0 #cfe4d7; box-shadow: 3px 3px 0 #cfe4d7;
+    }
+    .stat-label { display: block; color: #687b74; font-size: 10px; font-weight: bold; letter-spacing: .7px; text-transform: uppercase; }
+    .stat-value { display: block; color: #174d38; font-size: 21px; font-weight: bold; line-height: 1.1; }
+
+    .lesson-bar {
+      margin-bottom: 12px; padding: 7px; border: 2px solid #315447; border-radius: 14px;
+      background: #fff; text-align: center; -webkit-box-shadow: 0 4px 0 #d9ebe0; box-shadow: 0 4px 0 #d9ebe0;
+    }
+    .lesson-button {
+      min-height: 48px; margin: 3px 2px; padding: 6px 13px; border: 0; border-radius: 10px;
+      color: #42584f; background: #edf3ef; font-weight: bold; cursor: pointer;
+    }
+    .lesson-button:hover { background: #dcebe1; }
+    .lesson-button.active { color: #fff; background: #198b42; -webkit-box-shadow: inset 0 -4px 0 rgba(0,0,0,.18); box-shadow: inset 0 -4px 0 rgba(0,0,0,.18); }
+    .lesson-button[disabled] { color: #8a9791; background: #e8eeeb; cursor: default; opacity: .75; }
+    .lesson-button[disabled]:hover { background: #e8eeeb; }
+    .lesson-number {
+      display: inline-block; width: 29px; height: 29px; margin-right: 5px; border: 2px solid #315447;
+      border-radius: 50%; color: #315447; background: #fff; line-height: 25px; text-align: center; vertical-align: middle;
+    }
+    .lesson-button.active .lesson-number { color: #174d38; border-color: #fff; background: #dff85c; }
+    .lesson-copy { display: inline-block; text-align: left; vertical-align: middle; }
+    .lesson-copy small { display: block; color: #75867f; font-size: 10px; font-weight: normal; }
+    .lesson-button.active .lesson-copy small { color: #d9f4e1; }
+
+    .level-road {
+      position: relative; margin-bottom: 12px; padding: 9px 8px 8px; overflow-x: auto;
+      border: 2px solid #315447; border-radius: 14px; background: #f9fcfa;
+      white-space: nowrap; -webkit-box-shadow: 0 4px 0 #d9ebe0; box-shadow: 0 4px 0 #d9ebe0;
+    }
+    .level-road-title { margin: 0 0 7px 5px; color: #60756d; font-size: 10px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+    .level-button {
+      position: relative; width: 15.8%; min-width: 125px; min-height: 58px; margin: 0 .25%; padding: 6px 5px 6px 43px;
+      border: 2px solid #b4c5bc; border-radius: 10px; color: #53675e; background: #fff; text-align: left;
+      vertical-align: top; cursor: pointer;
+    }
+    .level-button:hover { border-color: #315447; background: #fff9cf; }
+    .level-button[disabled] { color: #8b9892; border-color: #d2dbd6; background: #eef2f0; cursor: default; }
+    .level-button.current { border: 3px solid #1c7bea; color: #174d38; background: #e9f4ff; }
+    .level-button.done { border-color: #218843; color: #174d38; background: #e1f5e6; }
+    .level-dot {
+      position: absolute; top: 50%; left: 8px; width: 29px; height: 29px; margin-top: -15px;
+      border: 2px solid #7d9187; border-radius: 50%; color: #52675d; background: #fff;
+      font-size: 13px; font-weight: bold; line-height: 25px; text-align: center;
+    }
+    .level-button.current .level-dot { color: #174d38; border-color: #174d38; background: #ffd23f; }
+    .level-button.done .level-dot { color: #fff; border-color: #166d34; background: #2eaa50; }
+    .level-button[disabled] .level-dot { color: #8b9892; border-color: #b9c4be; background: #dce3df; }
+    .level-name { display: block; overflow: hidden; font-size: 12px; font-weight: bold; line-height: 1.2; text-overflow: ellipsis; }
+    .level-state { display: block; margin-top: 3px; color: #71837a; font-size: 9px; font-weight: normal; }
+    .level-button.current .level-state { color: #1464bf; font-weight: bold; }
+    .level-button.done .level-state { color: #18723a; font-weight: bold; }
+
+    .game-shell {
+      overflow: hidden; border: 3px solid #214235; border-radius: 19px; background: #fff;
+      -webkit-box-shadow: 8px 8px 0 rgba(33,66,53,.16); box-shadow: 8px 8px 0 rgba(33,66,53,.16);
+    }
+    .instruction {
+      display: table; width: 100%; min-height: 62px; padding: 8px 15px; border-bottom: 3px solid #214235;
+      background: #fff3a6;
+    }
+    .instruction-copy, .mascot { display: table-cell; vertical-align: middle; }
+    .instruction-copy strong { display: block; color: #254c3c; font-size: 19px; }
+    .instruction-copy span { color: #586a64; font-size: 13px; }
+    .mascot { width: 190px; color: #24513d; font-size: 13px; font-weight: bold; text-align: right; }
+    .mascot-bubble { display: inline-block; padding: 7px 11px; border: 2px solid #315447; border-radius: 15px; background: #fff; }
+
+    .prompt-area { padding: 18px 10px 12px; text-align: center; background: #fbfdfc; }
+    .prompt-label { margin-bottom: 8px; color: #64776f; font-size: 11px; font-weight: bold; letter-spacing: 1.1px; text-transform: uppercase; }
+    .letter-strip { height: 82px; white-space: nowrap; }
+    .letter-card {
+      position: relative; display: inline-block; width: 64px; height: 68px; margin: 0 4px;
+      border: 2px solid #c7d4ce; border-radius: 10px; color: #607169; background: #fff;
+      font-size: 34px; line-height: 64px; text-align: center; vertical-align: top;
+    }
+    .letter-card.done { color: #fff; border-color: #27984a; background: #38aa57; }
+    .letter-card.current { border: 4px solid #1c7bea; color: #174d38; background: #e9f4ff; font-size: 42px; line-height: 60px; -webkit-transform: translateY(-4px); transform: translateY(-4px); }
+    .letter-card.current:after { content: "▼"; position: absolute; right: 0; bottom: -25px; left: 0; color: #1c7bea; font-size: 17px; line-height: 18px; }
+    .letter-card.space-card { width: 92px; font-size: 13px; font-weight: bold; letter-spacing: 1px; }
+    .letter-card.error { border-color: #d84736; background: #ffe2dc; -webkit-animation: shake .25s linear; animation: shake .25s linear; }
+    .progress-track { width: 84%; height: 11px; margin: 6px auto 0; overflow: hidden; border: 1px solid #9fb2aa; border-radius: 7px; background: #e5eee9; }
+    .progress-fill { width: 0; height: 100%; background: #2eaa50; -webkit-transition: width .2s ease; transition: width .2s ease; }
+
+    .practice-stage { position: relative; min-height: 402px; overflow: hidden; border-top: 1px solid #d7e1dc; background: #eaf5ef; }
+    .keyboard {
+      position: relative; z-index: 3; width: 720px; margin: 16px auto 0; padding: 8px;
+      border: 2px solid #7e948a; border-radius: 13px; background: #cddbd4;
+      -webkit-box-shadow: 0 7px 0 #a9bbb2; box-shadow: 0 7px 0 #a9bbb2;
+    }
+    .key-row { height: 48px; margin-bottom: 4px; text-align: center; white-space: nowrap; }
+    .key-row:last-child { margin-bottom: 0; }
+    .key {
+      position: relative; display: inline-block; width: 42px; height: 44px; margin: 0 2px; border: 1px solid #899990;
+      border-radius: 6px; color: #77857f; background: #f7faf8; font-size: 15px; font-weight: bold;
+      line-height: 40px; text-align: center; vertical-align: top; -webkit-box-shadow: 0 3px 0 #a9b7b0; box-shadow: 0 3px 0 #a9b7b0;
+    }
+    .key.wide { width: 61px; }
+    .key.space-key { width: 360px; color: #315447; font-size: 12px; letter-spacing: 2px; }
+    .key.home { color: #234a39; border: 2px solid #5f7c6e; background: #fff; font-size: 22px; line-height: 38px; }
+    .key.home .bump { display: block; width: 12px; height: 2px; margin: -7px auto 0; background: #587064; }
+    .key.target {
+      color: #fff; border: 3px solid #145d32; background: #20a94d; line-height: 36px;
+      -webkit-box-shadow: 0 0 0 6px #dff85c, 0 4px 0 #145d32; box-shadow: 0 0 0 6px #dff85c, 0 4px 0 #145d32;
+      -webkit-transform: translateY(-2px); transform: translateY(-2px);
+    }
+    .key.target:after { content: "●"; position: absolute; margin: -26px 0 0 -2px; color: #fff3a6; font-size: 10px; }
+    .key.pressed { -webkit-transform: translateY(3px); transform: translateY(3px); -webkit-box-shadow: none; box-shadow: none; }
+
+    .hands { position: absolute; z-index: 2; right: 0; bottom: -24px; left: 0; height: 215px; text-align: center; pointer-events: none; }
+    .hand { display: inline-block; width: 315px; height: 215px; margin: 0 23px; vertical-align: top; }
+    .palm { fill: #b9d9a9; stroke: #315447; stroke-width: 4; }
+    .finger { fill: #58bd51; stroke: #315447; stroke-width: 4; -webkit-transition: fill .15s ease; transition: fill .15s ease; }
+    .finger.active {
+      fill: #ffd23f; stroke: #b94b16; stroke-width: 8;
+      -webkit-filter: drop-shadow(0 0 9px #ff9f1c); filter: drop-shadow(0 0 9px #ff9f1c);
+      -webkit-animation: fingerPulse .7s ease-in-out infinite alternate;
+      animation: fingerPulse .7s ease-in-out infinite alternate;
+    }
+    .finger-label { fill: #163e2d; font-size: 18px; font-weight: bold; text-anchor: middle; pointer-events: none; }
+    .home-note {
+      position: absolute; z-index: 4; bottom: 8px; left: 50%; width: 280px; margin-left: -140px; padding: 7px 8px;
+      border: 3px solid #b94b16; border-radius: 12px; color: #274b3c; background: rgba(255,255,255,.96);
+      font-size: 12px; font-weight: bold; text-align: center;
+    }
+    .home-note strong { color: #b94b16; text-transform: uppercase; }
+
+    .bottom-bar { display: table; width: 100%; padding: 11px 4px 3px; }
+    .status, .controls { display: table-cell; vertical-align: middle; }
+    .status { color: #536a61; font-size: 13px; }
+    .status strong { color: #174d38; }
+    .controls { text-align: right; white-space: nowrap; }
+    .control-button {
+      min-height: 42px; margin-left: 5px; padding: 8px 13px; border: 2px solid #315447;
+      border-radius: 9px; color: #234a39; background: #fff; font-weight: bold; cursor: pointer;
+    }
+    .control-button:hover { background: #fff3a6; }
+    .start-button { color: #fff; border-color: #145d32; background: #198b42; }
+    .start-button:hover { background: #126f34; }
+
+    .reward-shelf {
+      display: table; width: 100%; margin-top: 12px; padding: 9px 11px;
+      border: 2px solid #315447; border-radius: 14px; background: #fff9d9;
+      -webkit-box-shadow: 0 4px 0 #e3dcae; box-shadow: 0 4px 0 #e3dcae;
+    }
+    .reward-shelf-main, .reward-shelf-actions { display: table-cell; vertical-align: middle; }
+    .reward-shelf-title { display: inline-block; margin-right: 9px; color: #174d38; font-size: 13px; font-weight: bold; vertical-align: middle; }
+    .reward-items { display: inline; vertical-align: middle; }
+    .reward-empty { color: #718078; font-size: 12px; }
+    .reward-item {
+      position: relative; display: inline-block; width: 55px; min-height: 53px; margin: 3px 7px 3px 0;
+      padding: 4px; border: 2px solid #9d6b13; border-radius: 10px; background: #fff; text-align: center; vertical-align: middle;
+    }
+    .reward-item svg { display: block; width: 34px; height: 34px; margin: 0 auto; }
+    .reward-item-name { display: block; overflow: hidden; font-size: 8px; font-weight: bold; line-height: 1.05; white-space: nowrap; text-overflow: ellipsis; }
+    .reward-count {
+      position: absolute; top: -8px; right: -8px; min-width: 25px; height: 23px; padding: 0 4px;
+      border: 2px solid #315447; border-radius: 12px; color: #174d38; background: #ffd23f;
+      font-size: 11px; font-weight: bold; line-height: 19px;
+    }
+    .reward-shelf-actions { width: 230px; text-align: right; }
+    .reset-lesson-button { color: #8b2f24; border-color: #8b2f24; background: #fff4ef; }
+
+    .reward-dialog { max-width: 590px; }
+    .reward-dialog h2 { margin-bottom: 3px; }
+    .reward-choices { margin: 16px 0 10px; white-space: nowrap; }
+    .reward-choice {
+      width: 29%; min-width: 125px; min-height: 135px; margin: 0 1%; padding: 10px 5px;
+      border: 3px solid #315447; border-radius: 14px; color: #254c3c; background: #fff;
+      font-weight: bold; cursor: pointer; vertical-align: top;
+      -webkit-box-shadow: 4px 4px 0 #d9c779; box-shadow: 4px 4px 0 #d9c779;
+    }
+    .reward-choice:hover { background: #fff3a6; -webkit-transform: translateY(-3px); transform: translateY(-3px); }
+    .reward-choice svg { display: block; width: 75px; height: 75px; margin: 0 auto 5px; }
+    .reward-choice small { display: block; margin-top: 4px; color: #718078; font-weight: normal; }
+
+    .overlay { position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; left: 0; display: none; background: rgba(24,52,42,.82); }
+    .dialog {
+      position: absolute; top: 50%; left: 50%; width: 92%; max-width: 490px; padding: 25px;
+      border: 4px solid #214235; border-radius: 20px; background: #fffdf4; text-align: center;
+      -webkit-transform: translate(-50%,-50%); transform: translate(-50%,-50%);
+      -webkit-box-shadow: 10px 10px 0 rgba(0,0,0,.2); box-shadow: 10px 10px 0 rgba(0,0,0,.2);
+    }
+    .dialog h2 { margin: 7px 0; color: #174d38; font-size: 30px; }
+    .dialog p { margin: 7px 0; }
+    .stars { color: #f4b400; font-size: 42px; letter-spacing: 5px; text-shadow: 2px 2px 0 #9a6a00; }
+    .result-grid { margin: 15px 0; }
+    .result-item { display: inline-block; min-width: 115px; margin: 4px; padding: 9px; border: 2px solid #b9cbc2; border-radius: 10px; background: #fff; }
+    .result-item b { display: block; color: #198b42; font-size: 25px; }
+    .result-item span { color: #65776f; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+
+    .welcome-card {
+      position: absolute; z-index: 12; top: 50%; left: 50%; width: 90%; max-width: 470px; padding: 18px;
+      border: 3px solid #214235; border-radius: 17px; background: #fffdf4; text-align: center;
+      -webkit-transform: translate(-50%,-50%); transform: translate(-50%,-50%);
+      -webkit-box-shadow: 7px 7px 0 rgba(33,66,53,.18); box-shadow: 7px 7px 0 rgba(33,66,53,.18);
+    }
+    .welcome-card h2 { margin: 0 0 5px; color: #174d38; font-size: 25px; }
+    .welcome-card p { margin: 4px 0 12px; color: #5d7067; }
+    .kbd { display: inline-block; min-width: 30px; padding: 2px 7px; border: 2px solid #587064; border-radius: 5px; background: #fff; font-weight: bold; -webkit-box-shadow: 0 3px 0 #a9b7b0; box-shadow: 0 3px 0 #a9b7b0; }
+
+    @-webkit-keyframes shake { 0%,100%{-webkit-transform:translateX(0)} 25%{-webkit-transform:translateX(-7px)} 75%{-webkit-transform:translateX(7px)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+    @-webkit-keyframes fingerPulse { from { fill: #ffd23f; } to { fill: #ff9f1c; } }
+    @keyframes fingerPulse { from { fill: #ffd23f; } to { fill: #ff9f1c; } }
+
+    @media (max-width: 820px) {
+      .app { padding: 8px; }
+      .topbar, .brand, .scoreboard { display: block; width: 100%; text-align: center; }
+      .scoreboard { margin-top: 8px; }
+      .keyboard { width: 690px; -webkit-transform: scale(.86); transform: scale(.86); -webkit-transform-origin: top center; transform-origin: top center; }
+      .practice-stage { min-height: 375px; }
+      .hands { bottom: -17px; }
+      .hand { width: 270px; margin: 0 12px; }
+    }
+    @media (max-width: 620px) {
+      h1 { font-size: 21px; }
+      .brand-mark { width: 48px; height: 48px; font-size: 24px; line-height: 42px; }
+      .stat { min-width: 69px; padding: 5px 4px; }
+      .lesson-button { padding: 5px 7px; }
+      .lesson-copy small { display: none; }
+      .level-button { width: 132px; min-width: 132px; }
+      .letter-card { width: 43px; height: 58px; margin: 0 2px; font-size: 27px; line-height: 54px; }
+      .letter-card.current { font-size: 34px; line-height: 50px; }
+      .letter-strip { height: 70px; }
+      .practice-stage { min-height: 330px; }
+      .keyboard { width: 690px; margin-left: 50%; -webkit-transform: translateX(-50%) scale(.69); transform: translateX(-50%) scale(.69); }
+      .hands { bottom: -38px; height: 200px; }
+      .hand { width: 220px; margin: 0 2px; }
+      .home-note { display: none; }
+      .status, .controls { display: block; text-align: center; }
+      .controls { margin-top: 8px; }
+      .mascot { display: none; }
+      .reward-shelf, .reward-shelf-main, .reward-shelf-actions { display: block; width: 100%; text-align: center; }
+      .reward-shelf-actions { margin-top: 7px; }
+      .reward-choices { white-space: normal; }
+      .reward-choice { min-width: 90px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">FJ</span>
+        <h1>Vườn Phím Xanh<span>Luyện gõ hàng cơ sở · Lớp 2</span></h1>
+      </div>
+      <div class="scoreboard" aria-label="Kết quả luyện tập">
+        <span class="stat"><span class="stat-label">Chính xác</span><span class="stat-value" id="accuracy">100%</span></span>
+        <span class="stat"><span class="stat-label">Tốc độ</span><span class="stat-value" id="speed">0</span></span>
+        <span class="stat"><span class="stat-label">Chuỗi đúng</span><span class="stat-value" id="streak">0</span></span>
+      </div>
+    </div>
+
+    <div class="lesson-bar" id="lessonBar" aria-label="Chọn bài luyện">
+      <button class="lesson-button active" data-lesson="0"><span class="lesson-number">1</span><span class="lesson-copy">F và J<small>Hai ngón trỏ</small></span></button>
+      <button class="lesson-button" data-lesson="1"><span class="lesson-number">2</span><span class="lesson-copy">D và K<small>Hai ngón giữa</small></span></button>
+      <button class="lesson-button" data-lesson="2"><span class="lesson-number">3</span><span class="lesson-copy">S và L<small>Hai ngón áp út</small></span></button>
+      <button class="lesson-button" data-lesson="3"><span class="lesson-number">4</span><span class="lesson-copy">A và ;<small>Hai ngón út</small></span></button>
+      <button class="lesson-button" data-lesson="4"><span class="lesson-number">5</span><span class="lesson-copy">G và H<small>Hai ngón trỏ</small></span></button>
+      <button class="lesson-button" data-lesson="5"><span class="lesson-number">6</span><span class="lesson-copy">Tổng ôn<small>Toàn hàng cơ sở</small></span></button>
+    </div>
+
+    <div class="level-road" aria-label="Các cấp độ trong bài luyện">
+      <div class="level-road-title" id="levelRoadTitle">Lộ trình F và J</div>
+      <div id="levelMap"></div>
+    </div>
+
+    <div class="game-shell">
+      <div class="instruction">
+        <div class="instruction-copy"><strong id="lessonTitle">Chạm mốc F và J</strong><span id="lessonHint">Đặt hai ngón trỏ lên hai phím có gờ. Nhìn màn hình, không nhìn bàn phím nhé!</span></div>
+        <div class="mascot"><span class="mascot-bubble" id="feedback" aria-live="polite">Sẵn sàng chưa?</span></div>
+      </div>
+
+      <div class="prompt-area">
+        <div class="prompt-label">Gõ phím có mũi tên xanh</div>
+        <div class="letter-strip" id="letterStrip" aria-live="polite"></div>
+        <div class="progress-track" aria-label="Tiến độ bài luyện"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+
+      <div class="practice-stage" id="practiceStage">
+        <div class="keyboard" aria-hidden="true">
+          <div class="key-row"><span class="key">Q</span><span class="key">W</span><span class="key">E</span><span class="key">R</span><span class="key">T</span><span class="key">Y</span><span class="key">U</span><span class="key">I</span><span class="key">O</span><span class="key">P</span></div>
+          <div class="key-row"><span class="key home" data-key="a">A</span><span class="key home" data-key="s">S</span><span class="key home" data-key="d">D</span><span class="key home" data-key="f">F<span class="bump"></span></span><span class="key home" data-key="g">G</span><span class="key home" data-key="h">H</span><span class="key home" data-key="j">J<span class="bump"></span></span><span class="key home" data-key="k">K</span><span class="key home" data-key="l">L</span><span class="key home" data-key=";">;</span></div>
+          <div class="key-row"><span class="key wide">Shift</span><span class="key">Z</span><span class="key">X</span><span class="key">C</span><span class="key">V</span><span class="key">B</span><span class="key">N</span><span class="key">M</span><span class="key">,</span><span class="key">.</span><span class="key wide">Shift</span></div>
+          <div class="key-row"><span class="key space-key" data-key="space">SPACE</span></div>
+        </div>
+
+        <div class="hands" aria-label="Hai bàn tay với các ngón tay màu xanh lá cây">
+          <svg class="hand left" viewBox="0 0 315 215" role="img" aria-label="Bàn tay trái">
+            <path class="palm" d="M72 202 C56 172,59 128,69 103 C76 86,91 75,110 75 L219 75 C245 76,262 95,263 121 L267 202 Z"/>
+            <path class="finger" data-finger="lp" d="M76 117 C63 106,52 88,47 70 C42 53,48 40,59 38 C71 36,77 46,79 59 L88 104 Z"/>
+            <path class="finger" data-finger="lr" d="M103 92 L95 39 C93 22,101 11,113 11 C126 11,131 22,130 37 L130 89 Z"/>
+            <path class="finger" data-finger="lm" d="M137 81 L137 25 C137 9,145 1,158 1 C171 1,178 11,177 26 L174 82 Z"/>
+            <path class="finger" data-finger="li" d="M181 85 L188 37 C190 21,200 14,212 17 C225 20,228 31,224 46 L214 91 Z"/>
+            <path class="finger" data-finger="lt" d="M218 110 C240 91,256 87,267 98 C276 108,270 120,258 131 L235 153 Z"/>
+            <text class="finger-label" x="61" y="67">A</text><text class="finger-label" x="112" y="47">S</text><text class="finger-label" x="157" y="39">D</text><text class="finger-label" x="207" y="54">F</text>
+          </svg>
+          <svg class="hand right" viewBox="0 0 315 215" role="img" aria-label="Bàn tay phải">
+            <g transform="translate(315 0) scale(-1 1)">
+              <path class="palm" d="M72 202 C56 172,59 128,69 103 C76 86,91 75,110 75 L219 75 C245 76,262 95,263 121 L267 202 Z"/>
+              <path class="finger" data-finger="rp" d="M76 117 C63 106,52 88,47 70 C42 53,48 40,59 38 C71 36,77 46,79 59 L88 104 Z"/>
+              <path class="finger" data-finger="rr" d="M103 92 L95 39 C93 22,101 11,113 11 C126 11,131 22,130 37 L130 89 Z"/>
+              <path class="finger" data-finger="rm" d="M137 81 L137 25 C137 9,145 1,158 1 C171 1,178 11,177 26 L174 82 Z"/>
+              <path class="finger" data-finger="ri" d="M181 85 L188 37 C190 21,200 14,212 17 C225 20,228 31,224 46 L214 91 Z"/>
+              <path class="finger" data-finger="rt" d="M218 110 C240 91,256 87,267 98 C276 108,270 120,258 131 L235 153 Z"/>
+            </g>
+            <text class="finger-label" x="254" y="67">;</text><text class="finger-label" x="203" y="47">L</text><text class="finger-label" x="158" y="39">K</text><text class="finger-label" x="108" y="54">J</text>
+          </svg>
+        </div>
+        <div class="home-note">Ngón cần dùng: <strong id="fingerGuide">ngón trỏ tay trái</strong></div>
+
+        <div class="welcome-card" id="welcomeCard">
+          <h2>Đặt tay đúng vị trí!</h2>
+          <p>Tay trái trên <span class="kbd">A S D F</span> · Tay phải trên <span class="kbd">J K L ;</span></p>
+          <button class="control-button start-button" id="welcomeStart">Bắt đầu luyện</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="status" id="statusText">Mẹo: Cong nhẹ các ngón tay và ngồi thẳng lưng.</div>
+      <div class="controls">
+        <button class="control-button" id="soundButton" aria-pressed="true">Âm thanh: Bật</button>
+        <button class="control-button" id="restartButton">↻ Làm lại</button>
+        <button class="control-button start-button" id="mainButton">Bắt đầu</button>
+      </div>
+    </div>
+
+    <div class="reward-shelf">
+      <div class="reward-shelf-main">
+        <span class="reward-shelf-title">Kho quà của em</span>
+        <span class="reward-items" id="rewardItems"><span class="reward-empty">Hoàn thành một cấp để nhận món quà đầu tiên!</span></span>
+      </div>
+      <div class="reward-shelf-actions">
+        <button class="control-button reset-lesson-button" id="resetLessonButton">Khôi phục bài học đầu tiết</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="resultOverlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="dialog">
+      <div class="stars" id="stars">★★★</div>
+      <h2 id="resultTitle">Giỏi lắm!</h2>
+      <p id="resultMessage">Em đã hoàn thành bài luyện.</p>
+      <div class="result-grid">
+        <span class="result-item"><b id="finalAccuracy">100%</b><span>Chính xác</span></span>
+        <span class="result-item"><b id="finalSpeed">0</b><span>Phím/phút</span></span>
+        <span class="result-item"><b id="finalBest">0</b><span>Chuỗi tốt nhất</span></span>
+      </div>
+      <button class="control-button" id="againButton">Luyện lại</button>
+      <button class="control-button start-button" id="nextButton">Bài tiếp theo →</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="rewardOverlay" role="dialog" aria-modal="true" aria-labelledby="rewardTitle">
+    <div class="dialog reward-dialog">
+      <div class="stars">★</div>
+      <h2 id="rewardTitle">Em nhận được một phần quà!</h2>
+      <p>Em đã gõ xong cả cấp! Chọn một món em thích nhé.</p>
+      <div class="reward-choices" id="rewardChoices"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var courses = [
+        { name: 'F và J', levels: [
+          { name: 'Làm quen F–J', title: 'Hai phím mốc F và J', hint: 'Đặt hai ngón trỏ lên hai phím có gờ và gõ luân phiên.', text: 'fjfjffjjfjfjjffjfjffjjfj' },
+          { name: 'Phím F và J', title: 'Nhịp gõ của hai ngón trỏ', hint: 'Gõ theo nhóm ngắn để hai ngón trỏ nhớ vị trí.', text: 'ffjjffjjfjfjffjjfjfjjffj' },
+          { name: 'Phím Space', title: 'F, J và phím Space', hint: 'Dùng ngón cái tay phải gõ Space giữa các nhóm F và J.', text: 'fj fj ffj jff fjf jfj ffjj fj' },
+          { name: 'Ôn F–J', title: 'Ôn tập F, J và Space', hint: 'Giữ nhịp đều và nhìn màn hình thay vì nhìn bàn phím.', text: 'ffjfj jfjjfjf jf fjjff jfj ffjjf' }
+        ]},
+        { name: 'D và K', levels: [
+          { name: 'Làm quen D–K', title: 'Hai phím D và K', hint: 'Ngón giữa trái gõ D, ngón giữa phải gõ K.', text: 'dkdkddkkdkdkkddkdkddkkdk' },
+          { name: 'Phím D và K', title: 'Nhịp gõ của hai ngón giữa', hint: 'Gõ theo nhóm ngắn để hai ngón giữa nhớ vị trí.', text: 'ddkkddkkdkdkddkkdkdkkddk' },
+          { name: 'Phím Space', title: 'D, K và phím Space', hint: 'Dùng ngón cái tay phải gõ Space giữa các nhóm D và K.', text: 'dk dk ddk kdd dkd kdk ddkk dk' },
+          { name: 'Ôn D–K', title: 'Ôn tập D, K và Space', hint: 'Giữ hai ngón trỏ trên F, J trong khi hai ngón giữa gõ D, K.', text: 'ddkdk kdkkdkd dk kddkk kdk ddkkd' }
+        ]},
+        { name: 'S và L', levels: [
+          { name: 'Làm quen S–L', title: 'Hai phím S và L', hint: 'Ngón áp út trái gõ S, ngón áp út phải gõ L.', text: 'slslssllslsllsslslsllsls' },
+          { name: 'Phím S và L', title: 'Nhịp gõ của hai ngón áp út', hint: 'Giữ cổ tay yên và chỉ nhấc đúng ngón áp út.', text: 'ssllssllslslssllslsllssl' },
+          { name: 'Phím Space', title: 'S, L và phím Space', hint: 'Dùng ngón cái tay phải gõ Space giữa các nhóm S và L.', text: 'sl sl ssl lss sls lsl ssll sl' },
+          { name: 'Ôn S–L', title: 'Ôn tập S, L và Space', hint: 'Thả lỏng hai ngón áp út và giữ các ngón khác ở vị trí nghỉ.', text: 'sslsl lsllsls sl lssll lsl sslls' }
+        ]},
+        { name: 'A và ;', levels: [
+          { name: 'Làm quen A–;', title: 'Hai phím A và ;', hint: 'Ngón út trái gõ A, ngón út phải gõ dấu chấm phẩy.', text: 'a;a;aa;;a;a;;aa;a;a;;a;a;' },
+          { name: 'Phím A và ;', title: 'Nhịp gõ của hai ngón út', hint: 'Gõ nhẹ bằng hai ngón út và không xoay cổ tay.', text: 'aa;;aa;;a;a;aa;;a;a;;aa;' },
+          { name: 'Phím Space', title: 'A, ; và phím Space', hint: 'Dùng ngón cái tay phải gõ Space giữa các nhóm A và ;.', text: 'a; a; aa; ;aa a;a ;a; aa;; a;' },
+          { name: 'Ôn A–;', title: 'Ôn tập A, ; và Space', hint: 'Thả lỏng hai ngón út, gõ chính xác rồi trở về vị trí nghỉ.', text: 'aa;a; ;a;;a;a a; ;aa;; a;a aa;;a' }
+        ]},
+        { name: 'G và H', levels: [
+          { name: 'Làm quen G–H', title: 'Hai phím G và H', hint: 'Ngón trỏ trái vươn sang G, ngón trỏ phải vươn sang H.', text: 'ghghgghhghghhghgghhghghg' },
+          { name: 'Phím G và H', title: 'Nhịp vươn của hai ngón trỏ', hint: 'Gõ G hoặc H rồi đưa ngón trỏ trở về F hoặc J.', text: 'gghhgghhghghgghhghghhggg' },
+          { name: 'Phím Space', title: 'G, H và phím Space', hint: 'Dùng ngón cái tay phải gõ Space giữa các nhóm G và H.', text: 'gh gh ggh hgg ghg hgh gghh gh' },
+          { name: 'Ôn G–H', title: 'Ôn tập G, H và Space', hint: 'Vươn ngón trỏ vào giữa rồi trở về đúng hai phím mốc F, J.', text: 'gghgh hghhghg gh hgg hhggh ghg' }
+        ]},
+        { name: 'Tổng ôn', levels: [
+          { name: '8 phím đầu', title: 'Tám phím A S D F J K L ;', hint: 'Gõ bằng tám ngón tay và luôn trở về vị trí nghỉ.', text: 'asdf jkl; fdsa ;lkj asdfjkl;' },
+          { name: 'Ôn hai tay', title: 'Tay trái và tay phải', hint: 'Luân phiên nhóm tay trái A S D F và tay phải J K L ;.', text: 'asdf fdsa jkl; ;lkj sadf kjl;' },
+          { name: 'Đủ hàng cơ sở', title: 'Thêm hai phím giữa G và H', hint: 'Gõ đủ mười phím bằng đúng ngón tay và dùng Space.', text: 'asdfgh jkl; hgfdsa ;lkj ghfjdk' },
+          { name: 'Siêu thử thách', title: 'Chơi toàn bộ hàng cơ sở', hint: 'Hoàn thành chuỗi dài với nhịp đều và độ chính xác cao.', text: 'asdfjkl; fjdkals; ghfjdkals; asdf jkl; gh' }
+        ]}
+      ];
+      var fingerFor = { a: 'lp', s: 'lr', d: 'lm', f: 'li', g: 'li', h: 'ri', j: 'ri', k: 'rm', l: 'rr', ';': 'rp', ' ': 'rt' };
+      var friendlyFinger = { lp: 'ngón út tay trái', lr: 'ngón áp út tay trái', lm: 'ngón giữa tay trái', li: 'ngón trỏ tay trái', lt: 'ngón cái tay trái', ri: 'ngón trỏ tay phải', rm: 'ngón giữa tay phải', rr: 'ngón áp út tay phải', rp: 'ngón út tay phải', rt: 'ngón cái tay phải' };
+      var rewardPool = [
+        { id: 'star', name: 'Ngôi sao' }, { id: 'gem', name: 'Kim cương' },
+        { id: 'crown', name: 'Vương miện' }, { id: 'flower', name: 'Bông hoa' },
+        { id: 'rocket', name: 'Tên lửa' }, { id: 'medal', name: 'Huy chương' }
+      ];
+      var state = { lesson: 0, level: 0, index: 0, attempts: 0, correct: 0, streak: 0, best: 0, started: false, paused: false, rewardOpen: false, rewardFinish: false, startTime: 0, elapsed: 0, sound: true, timer: null };
+      var progress = loadProgress();
+      var lessonButtons = document.getElementById('lessonBar').getElementsByTagName('button');
+      var letterStrip = document.getElementById('letterStrip');
+      var feedback = document.getElementById('feedback');
+      var welcomeCard = document.getElementById('welcomeCard');
+      var mainButton = document.getElementById('mainButton');
+      var resultOverlay = document.getElementById('resultOverlay');
+      var rewardOverlay = document.getElementById('rewardOverlay');
+      var rewardChoices = document.getElementById('rewardChoices');
+      var rewardItems = document.getElementById('rewardItems');
+      var levelMap = document.getElementById('levelMap');
+      var audioContext = null;
+
+      function addEvent(node, type, handler) {
+        if (node.addEventListener) { node.addEventListener(type, handler, false); }
+        else if (node.attachEvent) { node.attachEvent('on' + type, handler); }
+      }
+      function getClassName(node) {
+        if (node && node.getAttribute) { return node.getAttribute('class') || ''; }
+        return node && typeof node.className === 'string' ? node.className : '';
+      }
+      function setClassName(node, value) {
+        if (node && node.setAttribute) { node.setAttribute('class', value); }
+        else if (node) { node.className = value; }
+      }
+      function hasClass(node, name) { return new RegExp('(^|\\s)' + name + '(\\s|$)').test(getClassName(node)); }
+      function addClass(node, name) {
+        var value = getClassName(node);
+        if (!hasClass(node, name)) { setClassName(node, value + (value ? ' ' : '') + name); }
+      }
+      function removeClass(node, name) {
+        setClassName(node, getClassName(node).replace(new RegExp('(^|\\s)' + name + '(?=\\s|$)', 'g'), ' ').replace(/^\s+|\s+$/g, ''));
+      }
+      function setText(node, text) { if (typeof node.textContent !== 'undefined') { node.textContent = text; } else { node.innerText = text; } }
+
+      function loadProgress() {
+        try {
+          var saved = window.localStorage.getItem('homeRowLevelProgressV5');
+          if (saved) {
+            var parsed = JSON.parse(saved);
+            if (parsed && parsed.completed) {
+              if (!parsed.rewards) { parsed.rewards = {}; }
+              return parsed;
+            }
+          }
+        } catch (ignoreLoad) {}
+        return { completed: {}, rewards: {} };
+      }
+      function saveProgress() {
+        try { window.localStorage.setItem('homeRowLevelProgressV5', JSON.stringify(progress)); }
+        catch (ignoreSave) {}
+      }
+      function rewardSvg(id) {
+        if (id === 'star') { return '<svg viewBox="0 0 80 80" aria-hidden="true"><polygon points="40,5 49,29 75,30 55,46 62,72 40,57 18,72 25,46 5,30 31,29" fill="#ffd23f" stroke="#9a6500" stroke-width="4"/></svg>'; }
+        if (id === 'gem') { return '<svg viewBox="0 0 80 80" aria-hidden="true"><polygon points="18,12 62,12 76,32 40,72 4,32" fill="#65d6e8" stroke="#245a71" stroke-width="4"/><polyline points="18,12 28,32 40,72 52,32 62,12 M4,32 H76 M28,32 L40,12 52,32" fill="none" stroke="#fff" stroke-width="3"/></svg>'; }
+        if (id === 'crown') { return '<svg viewBox="0 0 80 80" aria-hidden="true"><polygon points="9,22 26,39 40,13 54,39 71,22 64,63 16,63" fill="#ffd23f" stroke="#8d5b0a" stroke-width="4"/><circle cx="9" cy="20" r="5" fill="#ed6a45"/><circle cx="40" cy="11" r="5" fill="#ed6a45"/><circle cx="71" cy="20" r="5" fill="#ed6a45"/></svg>'; }
+        if (id === 'flower') { return '<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 45 V75 M40 59 C30 49 21 53 21 62 C29 67 35 65 40 59 M40 63 C50 53 60 56 60 65 C52 70 46 68 40 63" fill="none" stroke="#258243" stroke-width="5"/><g fill="#f783ac" stroke="#9b3159" stroke-width="3"><circle cx="40" cy="25" r="12"/><circle cx="24" cy="36" r="12"/><circle cx="56" cy="36" r="12"/><circle cx="30" cy="18" r="12"/><circle cx="50" cy="18" r="12"/></g><circle cx="40" cy="29" r="10" fill="#ffd23f"/></svg>'; }
+        if (id === 'rocket') { return '<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M42 8 C61 18 65 40 50 57 L30 37 C35 20 37 13 42 8 Z" fill="#dce8ee" stroke="#315447" stroke-width="4"/><circle cx="46" cy="29" r="8" fill="#65d6e8" stroke="#315447" stroke-width="3"/><path d="M31 37 L18 41 25 50 M50 56 L47 70 38 62" fill="#ed6a45" stroke="#315447" stroke-width="4"/><path d="M29 53 C19 58 16 66 15 73 C23 71 31 67 35 59" fill="#ffd23f" stroke="#b94b16" stroke-width="3"/></svg>'; }
+        return '<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M24 48 L20 75 40 62 60 75 56 48" fill="#ed6a45" stroke="#8b3b21" stroke-width="4"/><circle cx="40" cy="34" r="26" fill="#ffd23f" stroke="#9a6500" stroke-width="5"/><circle cx="40" cy="34" r="15" fill="#fff3a6"/><polygon points="40,23 44,31 53,32 46,39 48,48 40,43 32,48 34,39 27,32 36,31" fill="#2eaa50"/></svg>';
+      }
+      function rewardName(id) {
+        var i;
+        for (i = 0; i < rewardPool.length; i += 1) { if (rewardPool[i].id === id) { return rewardPool[i].name; } }
+        return 'Phần quà';
+      }
+      function renderInventory() {
+        var html = '';
+        var i, count;
+        for (i = 0; i < rewardPool.length; i += 1) {
+          count = progress.rewards[rewardPool[i].id] || 0;
+          if (count > 0) {
+            html += '<span class="reward-item">' + rewardSvg(rewardPool[i].id) +
+              '<span class="reward-item-name">' + rewardPool[i].name + '</span>' +
+              (count > 1 ? '<span class="reward-count">×' + count + '</span>' : '') + '</span>';
+          }
+        }
+        rewardItems.innerHTML = html || '<span class="reward-empty">Hoàn thành một cấp để nhận món quà đầu tiên!</span>';
+      }
+      function openReward(finishAfterReward) {
+        var base = (Math.floor(state.correct / 10) + state.lesson + state.level) % rewardPool.length;
+        var html = '';
+        var i, reward;
+        state.elapsed = getElapsed(); state.paused = true; state.rewardOpen = true; state.rewardFinish = finishAfterReward;
+        for (i = 0; i < 3; i += 1) {
+          reward = rewardPool[(base + i * 2) % rewardPool.length];
+          html += '<button class="reward-choice" data-reward="' + reward.id + '">' + rewardSvg(reward.id) +
+            reward.name + '<small>Chọn món này</small></button>';
+        }
+        rewardChoices.innerHTML = html;
+        rewardOverlay.style.display = 'block';
+        mainButton.innerHTML = 'Đang chọn quà';
+        setText(feedback, 'Tuyệt! Em được chọn một phần quà!');
+        var buttons = rewardChoices.getElementsByTagName('button');
+        if (buttons.length) { buttons[0].focus(); }
+      }
+      function chooseReward(id) {
+        progress.rewards[id] = (progress.rewards[id] || 0) + 1;
+        saveProgress(); renderInventory();
+        rewardOverlay.style.display = 'none'; state.rewardOpen = false;
+        setText(feedback, 'Đã nhận ' + rewardName(id) + '!');
+        if (state.rewardFinish) { state.rewardFinish = false; finishGame(); }
+        else {
+          state.paused = false; state.startTime = new Date().getTime();
+          mainButton.innerHTML = 'Tạm dừng'; highlightTarget();
+        }
+      }
+      function levelKey(courseIndex, levelIndex) { return courseIndex + '-' + levelIndex; }
+      function isLevelDone(courseIndex, levelIndex) { return progress.completed[levelKey(courseIndex, levelIndex)] === 1; }
+      function isCourseUnlocked(courseIndex) { return courseIndex >= 0 && courseIndex < courses.length; }
+      function isLevelUnlocked(courseIndex, levelIndex) {
+        return levelIndex === 0 || isLevelDone(courseIndex, levelIndex - 1);
+      }
+      function currentLevel() { return courses[state.lesson].levels[state.level]; }
+      function firstOpenLevel(courseIndex) {
+        var levels = courses[courseIndex].levels;
+        var i;
+        for (i = 0; i < levels.length; i += 1) {
+          if (!isLevelDone(courseIndex, i)) { return isLevelUnlocked(courseIndex, i) ? i : Math.max(0, i - 1); }
+        }
+        return levels.length - 1;
+      }
+
+      function getAccuracy() { return state.attempts ? Math.round(state.correct * 100 / state.attempts) : 100; }
+      function getElapsed() { return state.started && !state.paused ? state.elapsed + (new Date().getTime() - state.startTime) : state.elapsed; }
+      function getSpeed() { var minutes = getElapsed() / 60000; return minutes > 0 ? Math.round(state.correct / minutes) : 0; }
+
+      function updateStats() {
+        setText(document.getElementById('accuracy'), getAccuracy() + '%');
+        setText(document.getElementById('speed'), getSpeed());
+        setText(document.getElementById('streak'), state.streak);
+      }
+
+      function clearHighlights() {
+        var keys = document.getElementsByClassName('key');
+        var fingers = document.getElementsByClassName('finger');
+        var i;
+        for (i = 0; i < keys.length; i += 1) { removeClass(keys[i], 'target'); removeClass(keys[i], 'pressed'); }
+        for (i = 0; i < fingers.length; i += 1) {
+          removeClass(fingers[i], 'active');
+          fingers[i].style.fill = '#58bd51';
+          fingers[i].style.stroke = '#315447';
+          fingers[i].style.strokeWidth = '4px';
+        }
+      }
+
+      function displayKey(keyChar) { return keyChar === ' ' ? 'SPACE' : keyChar.toUpperCase(); }
+
+      function highlightTarget() {
+        clearHighlights();
+        var text = currentLevel().text;
+        if (state.index >= text.length) { return; }
+        var target = text.charAt(state.index);
+        var keyValue = target === ' ' ? 'space' : target;
+        var key = document.querySelector ? document.querySelector('[data-key="' + keyValue + '"]') : null;
+        var finger = document.querySelector ? document.querySelector('[data-finger="' + fingerFor[target] + '"]') : null;
+        if (key) { addClass(key, 'target'); }
+        if (finger) {
+          addClass(finger, 'active');
+          /* Inline SVG colors are required for reliable display in old Chrome on Windows 7. */
+          finger.style.fill = '#ffd23f';
+          finger.style.stroke = '#b94b16';
+          finger.style.strokeWidth = '8px';
+        }
+        setText(document.getElementById('fingerGuide'), friendlyFinger[fingerFor[target]]);
+        setText(document.getElementById('statusText'), 'Dùng ' + friendlyFinger[fingerFor[target]] + ' để gõ “' + displayKey(target) + '”.');
+      }
+
+      function renderLetters() {
+        var text = currentLevel().text;
+        var start = Math.max(0, Math.min(state.index - 2, text.length - 7));
+        var end = Math.min(text.length, start + 7);
+        var html = '';
+        var i, cls;
+        for (i = start; i < end; i += 1) {
+          cls = 'letter-card';
+          if (text.charAt(i) === ' ') { cls += ' space-card'; }
+          if (i < state.index) { cls += ' done'; }
+          if (i === state.index) { cls += ' current'; }
+          html += '<span class="' + cls + '" data-position="' + i + '">' + displayKey(text.charAt(i)) + '</span>';
+        }
+        letterStrip.innerHTML = html;
+        document.getElementById('progressFill').style.width = Math.round(state.index * 100 / text.length) + '%';
+        highlightTarget();
+      }
+
+      function renderLevelMap() {
+        var levels = courses[state.lesson].levels;
+        var html = '';
+        var i, done, unlocked, current, stateLabel, classes;
+        setText(document.getElementById('levelRoadTitle'), 'Lộ trình ' + courses[state.lesson].name + ' · ' + levels.length + ' cấp độ');
+        for (i = 0; i < levels.length; i += 1) {
+          done = isLevelDone(state.lesson, i);
+          unlocked = isLevelUnlocked(state.lesson, i);
+          current = i === state.level;
+          classes = 'level-button' + (done ? ' done' : '') + (current ? ' current' : '');
+          stateLabel = current ? (done ? 'Đang luyện lại' : 'Đang học') : (done ? 'Đã xong ✓' : (unlocked ? 'Có thể học' : 'Đang khóa'));
+          html += '<button class="' + classes + '" data-level="' + i + '"' + (unlocked ? '' : ' disabled="disabled"') + '>' +
+            '<span class="level-dot">' + (done ? '✓' : (i + 1)) + '</span>' +
+            '<span class="level-name">' + levels[i].name + '</span>' +
+            '<span class="level-state">' + stateLabel + '</span></button>';
+        }
+        levelMap.innerHTML = html;
+      }
+
+      function renderLesson() {
+        var i;
+        for (i = 0; i < lessonButtons.length; i += 1) {
+          lessonButtons[i].disabled = !isCourseUnlocked(i);
+          lessonButtons[i].setAttribute('aria-disabled', lessonButtons[i].disabled ? 'true' : 'false');
+          if (parseInt(lessonButtons[i].getAttribute('data-lesson'), 10) === state.lesson) { addClass(lessonButtons[i], 'active'); }
+          else { removeClass(lessonButtons[i], 'active'); }
+        }
+        renderLevelMap();
+        setText(document.getElementById('lessonTitle'), 'Cấp ' + (state.level + 1) + ' · ' + currentLevel().title);
+        setText(document.getElementById('lessonHint'), currentLevel().hint);
+        renderLetters();
+        updateStats();
+      }
+
+      function resetState(showWelcome) {
+        if (state.timer) { window.clearInterval(state.timer); state.timer = null; }
+        state.index = 0; state.attempts = 0; state.correct = 0; state.streak = 0; state.best = 0;
+        state.started = false; state.paused = false; state.rewardOpen = false; state.rewardFinish = false; state.startTime = 0; state.elapsed = 0;
+        mainButton.innerHTML = 'Bắt đầu';
+        setText(feedback, 'Sẵn sàng chưa?');
+        welcomeCard.style.display = showWelcome ? 'block' : 'none';
+        resultOverlay.style.display = 'none';
+        rewardOverlay.style.display = 'none';
+        renderLesson();
+      }
+
+      function beep(good) {
+        if (!state.sound || !window.AudioContext && !window.webkitAudioContext) { return; }
+        try {
+          if (!audioContext) { audioContext = new (window.AudioContext || window.webkitAudioContext)(); }
+          var oscillator = audioContext.createOscillator();
+          var gain = audioContext.createGain();
+          oscillator.type = 'sine'; oscillator.frequency.value = good ? 620 : 180;
+          gain.gain.value = 0.045; oscillator.connect(gain); gain.connect(audioContext.destination);
+          oscillator.start(0); oscillator.stop(audioContext.currentTime + (good ? 0.06 : 0.12));
+        } catch (ignoreAudio) {}
+      }
+
+      function startGame() {
+        if (state.started && !state.paused) { pauseGame(); return; }
+        welcomeCard.style.display = 'none';
+        if (!state.started) {
+          state.started = true; state.startTime = new Date().getTime();
+          state.timer = window.setInterval(updateStats, 1000);
+          setText(feedback, 'Gõ phím đang sáng!');
+        } else {
+          state.paused = false; state.startTime = new Date().getTime();
+          setText(feedback, 'Tiếp tục nào!');
+        }
+        mainButton.innerHTML = 'Tạm dừng';
+        highlightTarget();
+      }
+
+      function pauseGame() {
+        if (!state.started || state.paused) { return; }
+        state.elapsed += new Date().getTime() - state.startTime;
+        state.paused = true; mainButton.innerHTML = 'Tiếp tục';
+        setText(feedback, 'Đã tạm dừng'); clearHighlights();
+      }
+
+      function finishGame() {
+        state.elapsed = getElapsed(); state.started = false; state.paused = false;
+        if (state.timer) { window.clearInterval(state.timer); state.timer = null; }
+        clearHighlights(); updateStats();
+        var accuracy = getAccuracy();
+        var passed = accuracy >= 80;
+        var starCount = accuracy >= 95 ? 3 : (accuracy >= 80 ? 2 : 1);
+        if (passed) {
+          progress.completed[levelKey(state.lesson, state.level)] = 1;
+          saveProgress();
+          renderLevelMap();
+        }
+        setText(document.getElementById('stars'), starCount === 3 ? '★★★' : (starCount === 2 ? '★★☆' : '★☆☆'));
+        setText(document.getElementById('resultTitle'), passed ? (accuracy >= 95 ? 'Xuất sắc!' : 'Mở khóa cấp mới!') : 'Cố thêm một chút!');
+        setText(document.getElementById('resultMessage'), passed ? 'Em đã hoàn thành cấp ' + (state.level + 1) + ' và mở khóa thử thách tiếp theo.' : 'Cần đạt ít nhất 80% chính xác để mở khóa cấp tiếp theo.');
+        setText(document.getElementById('finalAccuracy'), accuracy + '%');
+        setText(document.getElementById('finalSpeed'), getSpeed());
+        setText(document.getElementById('finalBest'), state.best);
+        document.getElementById('nextButton').style.display = passed && (state.level < courses[state.lesson].levels.length - 1 || state.lesson < courses.length - 1) ? 'inline-block' : 'none';
+        setText(document.getElementById('nextButton'), state.level < courses[state.lesson].levels.length - 1 ? 'Cấp tiếp theo →' : 'Nhóm phím tiếp theo →');
+        resultOverlay.style.display = 'block';
+        try {
+          var bestKey = 'homeRowBest' + state.lesson + '-' + state.level;
+          var oldBest = parseInt(window.localStorage.getItem(bestKey), 10) || 0;
+          if (accuracy > oldBest) { window.localStorage.setItem(bestKey, accuracy); }
+        } catch (ignoreStorage) {}
+        document.getElementById('againButton').focus();
+      }
+
+      function keyFromEvent(event) {
+        var code = event.which || event.keyCode;
+        var map = { 32:' ', 65:'a', 83:'s', 68:'d', 70:'f', 71:'g', 72:'h', 74:'j', 75:'k', 76:'l', 186:';', 59:';' };
+        return map[code] || '';
+      }
+
+      function flashPressed(keyChar) {
+        var keyValue = keyChar === ' ' ? 'space' : keyChar;
+        var key = document.querySelector ? document.querySelector('[data-key="' + keyValue + '"]') : null;
+        if (key) { addClass(key, 'pressed'); window.setTimeout(function () { removeClass(key, 'pressed'); }, 100); }
+      }
+
+      function handleKey(event) {
+        event = event || window.event;
+        if (resultOverlay.style.display === 'block' || state.rewardOpen) { return; }
+        var key = keyFromEvent(event);
+        if (!key) { return; }
+        if (event.preventDefault) { event.preventDefault(); } event.returnValue = false;
+        if (!state.started) { startGame(); }
+        if (state.paused) { return; }
+        flashPressed(key); state.attempts += 1;
+        var target = currentLevel().text.charAt(state.index);
+        if (key === target) {
+          state.correct += 1; state.streak += 1; state.best = Math.max(state.best, state.streak); state.index += 1;
+          setText(feedback, state.streak > 0 && state.streak % 5 === 0 ? 'Tuyệt! Chuỗi ' + state.streak + ' phím đúng! ★' : 'Đúng rồi! ✓');
+          beep(true); renderLetters(); updateStats();
+          if (state.index >= currentLevel().text.length) {
+            state.rewardOpen = true;
+            setText(feedback, 'Hoàn thành cấp! Em được chọn quà!');
+            window.setTimeout(function () { openReward(true); }, 250);
+          }
+        } else {
+          state.streak = 0; setText(feedback, 'Thử lại: gõ “' + displayKey(target) + '”'); beep(false); updateStats();
+          var current = letterStrip.getElementsByClassName('current');
+          if (current.length) { addClass(current[0], 'error'); window.setTimeout(function () { if (current[0]) { removeClass(current[0], 'error'); } }, 280); }
+        }
+      }
+
+      function chooseLesson(index) {
+        if (!isCourseUnlocked(index)) { return; }
+        if (state.started && !window.confirm('Đổi bài luyện? Kết quả hiện tại sẽ bắt đầu lại.')) { return; }
+        state.lesson = index; state.level = firstOpenLevel(index); resetState(true);
+      }
+
+      function chooseLevel(index) {
+        if (!isLevelUnlocked(state.lesson, index)) { return; }
+        if (state.started && !window.confirm('Đổi cấp độ? Kết quả hiện tại sẽ bắt đầu lại.')) { return; }
+        state.level = index; resetState(true);
+      }
+
+      function restoreLessonStart() {
+        if (!window.confirm('Khôi phục bài học đầu tiết sẽ xóa toàn bộ cấp đã mở và kho quà trên máy này. Thầy/cô có chắc chắn không?')) { return; }
+        try {
+          window.localStorage.removeItem('homeRowLevelProgressV1');
+          window.localStorage.removeItem('homeRowLevelProgressV2');
+          window.localStorage.removeItem('homeRowLevelProgressV3');
+          window.localStorage.removeItem('homeRowLevelProgressV4');
+          window.localStorage.removeItem('homeRowLevelProgressV5');
+          var courseIndex, levelIndex;
+          for (courseIndex = 0; courseIndex < courses.length; courseIndex += 1) {
+            for (levelIndex = 0; levelIndex < courses[courseIndex].levels.length; levelIndex += 1) {
+              window.localStorage.removeItem('homeRowBest' + courseIndex + '-' + levelIndex);
+            }
+          }
+        } catch (ignoreReset) {}
+        progress = { completed: {}, rewards: {} };
+        state.lesson = 0; state.level = 0;
+        saveProgress(); renderInventory(); resetState(true);
+        setText(feedback, 'Đã sẵn sàng cho lớp học mới!');
+      }
+
+      var i;
+      for (i = 0; i < lessonButtons.length; i += 1) {
+        addEvent(lessonButtons[i], 'click', function (event) {
+          event = event || window.event;
+          chooseLesson(parseInt((event.currentTarget || event.srcElement).getAttribute('data-lesson'), 10));
+        });
+      }
+      addEvent(levelMap, 'click', function (event) {
+        event = event || window.event;
+        var node = event.target || event.srcElement;
+        while (node && node !== levelMap && !hasClass(node, 'level-button')) { node = node.parentNode; }
+        if (node && node !== levelMap && !node.disabled) { chooseLevel(parseInt(node.getAttribute('data-level'), 10)); }
+      });
+      addEvent(rewardChoices, 'click', function (event) {
+        event = event || window.event;
+        var node = event.target || event.srcElement;
+        while (node && node !== rewardChoices && !node.getAttribute('data-reward')) { node = node.parentNode; }
+        if (node && node !== rewardChoices) { chooseReward(node.getAttribute('data-reward')); }
+      });
+      addEvent(document, 'keydown', handleKey);
+      addEvent(document.getElementById('welcomeStart'), 'click', startGame);
+      addEvent(mainButton, 'click', startGame);
+      addEvent(document.getElementById('restartButton'), 'click', function () { resetState(false); startGame(); });
+      addEvent(document.getElementById('soundButton'), 'click', function () {
+        state.sound = !state.sound;
+        this.setAttribute('aria-pressed', state.sound ? 'true' : 'false');
+        this.innerHTML = state.sound ? 'Âm thanh: Bật' : 'Âm thanh: Tắt';
+      });
+      addEvent(document.getElementById('againButton'), 'click', function () { resetState(false); startGame(); });
+      addEvent(document.getElementById('resetLessonButton'), 'click', restoreLessonStart);
+      addEvent(document.getElementById('nextButton'), 'click', function () {
+        if (state.level < courses[state.lesson].levels.length - 1) { state.level += 1; }
+        else if (state.lesson < courses.length - 1) { state.lesson += 1; state.level = 0; }
+        resetState(false); startGame();
+      });
+      addEvent(window, 'blur', function () { if (state.started && !state.paused) { pauseGame(); } });
+      addEvent(document, 'visibilitychange', function () { if (document.hidden && state.started && !state.paused) { pauseGame(); } });
+
+      renderInventory(); resetState(true);
+    }());
+  </script>
+</body>
+</html>
